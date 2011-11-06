@@ -22,6 +22,7 @@ DEPEND=""
 RDEPEND="
 	dev-libs/glib:2
 	dev-libs/openssl:0.9.8
+	sys-libs/zlib
 	x11-libs/cairo
 	x11-libs/gtk+:2
 	x11-libs/gtksourceview:2.0
@@ -34,7 +35,7 @@ RDEPEND="
 RESTRICT="mirror"
 QA_PREBUILT="opt/${P}/bin/notecase opt/${P}/$(get_libdir)/*"
 
-S="${WORKDIR}"
+S=${WORKDIR}
 
 pkg_postinst() {
 	fdo-mime_desktop_database_update

@@ -3,6 +3,9 @@
 # $Header: $
 
   06 Nov 2011; Maxim Koltsov <maksbotan@gentoo.org> notecase-pro-3.5.1.ebuild:
+  Remove useless quoting, add zlib dependency. Thanks to ssuominen
+
+  06 Nov 2011; Maxim Koltsov <maksbotan@gentoo.org> notecase-pro-3.5.1.ebuild:
   Remove redunant dodir call, thanks to ssuominen
 
 *notecase-pro-3.5.1 (06 Nov 2011)
