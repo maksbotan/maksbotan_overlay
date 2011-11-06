@@ -51,7 +51,6 @@ pkg_postrm() {
 }
 
 src_install() {
-	dodir /opt/${P}
 	exeinto /opt/${P}/bin
 	doexe usr/bin/notecase
 
