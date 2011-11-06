@@ -1,0 +1,10 @@
+# ChangeLog for app-text/notecase-pro
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*notecase-pro-3.5.1 (06 Nov 2011)
+
+  06 Nov 2011; Maxim Koltsov <maksbotan@gentoo.org> +notecase-pro-3.5.1.ebuild,
+  +metadata.xml:
+  Add notecase-pro-3.5.1 with fixed ebuild from upstream
+
