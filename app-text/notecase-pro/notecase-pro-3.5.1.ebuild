@@ -53,7 +53,7 @@ pkg_postrm() {
 
 src_install() {
 	exeinto /opt/${P}/bin
-	doexe usr/bin/notecase
+	doexe usr/bin/notecas
 
 	insinto /opt/${P}/$(get_libdir)
 	doins -r usr/$(get_libdir)/notecase
@@ -61,5 +61,5 @@ src_install() {
 	insinto /usr/share
 	doins -r usr/share/*
 
-	make_wrapper notecase /opt/${P}/bin/notecase "" /opt/${P}/$(get_libdir)/
+	make_wrapper ${PN} /opt/${P}/bin/notecase "" /opt/${P}/$(get_libdir)/
 }
