@@ -18,26 +18,101 @@ changelog_helper() {
 
 if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
     eerror "Not enough arguments"
-    einfo "Usage: ${0} mode version|message"
+    einfo "Usage: ${0} mode arguments"
     einfo "Supported modes are:"
     einfo " - bump"
     einfo " - commit"
     einfo " - repoman"
     einfo " - delete"
     einfo " - changelog"
+    einfo "Supported arguments are:"
+    einfo " -m --message        Commit message"
+    einfo " -c --changelog      Update ChangeLog"
+    einfo " -N --no-changelog   Do not update ChangeLog"
+    einfo " -v --version        Target version for bump"
+    einfo " -f --bump-from      Source version for bump"
     exit 1
 fi
 
 case "${1}" in
-    bump|commit|repoman|delete|eapi|changelog) ;;
+    bump|commit|repoman|delete|changelog) ;;
     *)
         eerror "Unknown mode ${1}"
         exit 1
         ;;
 esac
 
-mode=${1}
-version=${2}
+mode="${1}"
+shift
+
+while (($#)); do
+    case "$1" in
+        -m|--message)
+            message="${2}"
+            shift
+            ;;
+        -c|--changelog)
+            run_changelog="1"
+            shift
+            ;;
+        -N|--no-changelog)
+            run_changelog="0"
+            shift
+            ;;
+       -v|--version)
+            version="${2}"
+            shift
+            ;;
+        -f|--bump-from)
+            bump_from="${2}"
+            shift
+            ;;
+        -*)
+            eerror "Unknown option $1"
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+case $mode in
+    bump)
+        if [[ -z "${version}" ]]; then
+            eerror "Please specify target bump version"
+            exit
+        fi
+
+        if [[ -z "${bump_from}" ]]; then
+            bump_from=9999
+        fi
+        if [[ ${run_changelog} != "0" ]]; then
+            run_changelog="1"
+        fi
+        ;;
+    commit)
+        if [[ -z "${message}" ]]; then
+            eerror "Please specify commit message"
+            exit
+        fi
+        ;;
+    delete)
+        if [[ -z "${version}" ]]; then
+            eerror "Please specify version to remove"
+            exit
+        fi
+        if [[ ${run_changelog} != "0" ]]; then
+           run_changelog="1"
+        fi
+        ;;
+    changelog)
+        if [[ -z ${message} ]]; then
+            eerror "Please specify ChangeLog message"
+            exit
+        fi
+        ;;
+esac
 
 #checking whether we are in portage tree or overlay
 if [[ ! -e ./profiles/repo_name ]]; then
@@ -64,6 +139,10 @@ for atom in */*; do
 
     case ${mode} in
     bump)
+        if [[ -z "${message}" ]]; then
+            message="Bump ${atom} to ${version}, thanks to 0xd34df00d"
+        fi
+
         einfo "Bumping ${atom} to ${version}"
 
         if [[ -e ${PN}-${version}.ebuild ]]; then
@@ -73,33 +152,45 @@ for atom in */*; do
             continue
         fi
 
-        ebegin "Copying ${PN}-9999.ebuild to ${PN}-${version}.ebuild"
-        cp ${PN}-{9999,${version}}.ebuild
+        if ! [[ -e "${PN}-${bump_from}.ebuild" ]]; then
+            ewarn "${atom} lacks ${bump_from} version, skipping bump"
+            cd - > /dev/null
+            eoutdent
+            continue
+        fi
+
+        ebegin "Copying ${PN}-${bump_from}.ebuild to ${PN}-${version}.ebuild"
+        cp ${PN}-{${bump_from},${version}}.ebuild
         eend $?
     
         ebegin "Setting keywords on ${PN}-${version}.ebuild"
-        ekeyword ~amd64 ~x86 ${PN}-${version}.ebuild
+        ekeyword ~all ${PN}-${version}.ebuild > /dev/null
         eend $?
     
         ebegin "Running repoman manifest on ${atom}"
-        repoman manifest
+        repoman manifest > /dev/null
         eend $?
     
         ebegin "Running cvs add ${PN}-${version}.ebuild"
-        cvs add ${PN}-${version}.ebuild
+        cvs add ${PN}-${version}.ebuild > /dev/null
         eend $?
 
-        ebegin "Generating ChangeLog for ${atom}"
-        changelog_helper --changelog "${4}" "Bump ${atom} to ${version}, thanks to 0xd34df00d"
-        eend $?
-        
+        if [[ ${run_changelog} == "1" ]]; then
+            ebegin "Generating ChangeLog for ${atom}"
+            echangelog ${message} > /dev/null
+            eend $?
+        fi
         ;;
     commit)
-        einfo "Commiting ${atom} with message \"${version}\""
+        einfo "Commiting ${atom} with message \"${message}\""
 
-        ebegin "Running repoman commit -m \"${version}\""
-        repoman commit -m "${version}"
-        eend $?
+        ebegin "Running repoman commit -m \"${message}\""
+        if [[ ${run_changelog} == "0" ]]; then
+            changelog_arg="--echangelog=n"
+        else
+            changelog_arg=""
+        fi
+        repoman commit ${changelog_arg} -m "${message}"
 
         ;;
     repoman)
@@ -108,23 +199,26 @@ for atom in */*; do
 
         ;;
     delete)
-        einfo "Deleting ${PN}-${version}"
-        
+        if [[ -z "${message}" ]]; then
+            message="Removed old ${PN}-${version}"
+        fi
+
+        ebegin "Deleting ${PN}-${version}"
         rm ${PN}-${version}.ebuild
-        cvs rm ${PN}-${version}.ebuild
-        changelog_helper "${3}" "${4}" "Removed old ${PN}-${version}"
+        cvs rm ${PN}-${version}.ebuild > /dev/null
+        eend $?
 
-        ;;
-    eapi)
-        einfo "Changing EAPI to 4 in ${atom}-${version}"
-
-        sed -i 's:EAPI="2":EAPI="4":' ${PN}-${version}.ebuild
-        changelog_helper "${3}" "${4}" "Bumped to EAPI=\"4\""
+        if [[ ${run_changelog} == "1" ]]; then
+            ebegin "Generating changelog in ${atom}"
+            echangelog ${message} > /dev/null
+            eend $?
+        fi
 
         ;;
     changelog)
-        einfo "Running echangelog in ${atom}"
-        echangelog ${version}
+        ebegin "Running echangelog in ${atom}"
+        echangelog ${message} > /dev/null
+        eend $?
     esac
 
 
