@@ -2,6 +2,20 @@
 
 . /etc/init.d/functions.sh
 
+#First argument is changelog arg, second is message arg, third is default message
+changelog_helper() {
+    if [[ "x${1}" == "x--changelog" ]]; then
+        local message
+        if [[ ${2} ]]; then
+            message="${2}"
+        else
+            message="${3}"
+        fi
+        einfo "Running echangelog"
+        echangelog ${message}
+    fi
+}
+
 if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
     eerror "Not enough arguments"
     einfo "Usage: ${0} mode version|message"
@@ -9,11 +23,13 @@ if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
     einfo " - bump"
     einfo " - commit"
     einfo " - repoman"
+    einfo " - delete"
+    einfo " - changelog"
     exit 1
 fi
 
 case "${1}" in
-    bump|commit|repoman) ;;
+    bump|commit|repoman|delete|eapi|changelog) ;;
     *)
         eerror "Unknown mode ${1}"
         exit 1
@@ -74,7 +90,7 @@ for atom in */*; do
         eend $?
 
         ebegin "Generating ChangeLog for ${atom}"
-        echangelog "Bump ${atom} to ${version}, thanks to 0xd34df00d"
+        changelog_helper --changelog "${4}" "Bump ${atom} to ${version}, thanks to 0xd34df00d"
         eend $?
         
         ;;
@@ -91,6 +107,24 @@ for atom in */*; do
         repoman fix
 
         ;;
+    delete)
+        einfo "Deleting ${PN}-${version}"
+        
+        rm ${PN}-${version}.ebuild
+        cvs rm ${PN}-${version}.ebuild
+        changelog_helper "${3}" "${4}" "Removed old ${PN}-${version}"
+
+        ;;
+    eapi)
+        einfo "Changing EAPI to 4 in ${atom}-${version}"
+
+        sed -i 's:EAPI="2":EAPI="4":' ${PN}-${version}.ebuild
+        changelog_helper "${3}" "${4}" "Bumped to EAPI=\"4\""
+
+        ;;
+    changelog)
+        einfo "Running echangelog in ${atom}"
+        echangelog ${version}
     esac
 
 
