@@ -1,0 +1,10 @@
+# ChangeLog for www-apps/gitlabhq
+# Copyright 1999-2012 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*gitlabhq-2.0.0 (14 Jan 2012)
+
+  14 Jan 2012; Maxim Koltsov <maksbotan@gentoo.org> +gitlabhq-2.0.0.ebuild,
+  +metadata.xml:
+  Add www-apps/gitlabhq
+
