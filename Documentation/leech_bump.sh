@@ -25,17 +25,19 @@ if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
     einfo " - repoman"
     einfo " - delete"
     einfo " - changelog"
+    einfo " - keyword"
     einfo "Supported arguments are:"
     einfo " -m --message        Commit message"
     einfo " -c --changelog      Update ChangeLog"
     einfo " -N --no-changelog   Do not update ChangeLog"
     einfo " -v --version        Target version for bump"
     einfo " -f --bump-from      Source version for bump"
+    einfo " -k --keyword        Keywords to set"
     exit 1
 fi
 
 case "${1}" in
-    bump|commit|repoman|delete|changelog) ;;
+    bump|commit|repoman|delete|changelog|keyword) ;;
     *)
         eerror "Unknown mode ${1}"
         exit 1
@@ -65,6 +67,10 @@ while (($#)); do
             ;;
         -f|--bump-from)
             bump_from="${2}"
+            shift
+            ;;
+        -k|--keyword)
+            keyword="${2}"
             shift
             ;;
         -*)
@@ -109,6 +115,12 @@ case $mode in
     changelog)
         if [[ -z ${message} ]]; then
             eerror "Please specify ChangeLog message"
+            exit
+        fi
+        ;;
+    keyword)
+        if [[ -z ${keyword} || -z ${version} ]]; then
+            eerror "You must specify --keyword and --version arguments"
             exit
         fi
         ;;
@@ -214,11 +226,38 @@ for atom in */*; do
             eend $?
         fi
 
+        ebegin "Running repoman manifest on ${atom}"
+        repoman manifest > /dev/null
+        eend $?
+
         ;;
     changelog)
         ebegin "Running echangelog in ${atom}"
         echangelog ${message} > /dev/null
         eend $?
+
+        ebegin "Running repoman manifest on ${atom}"
+        repoman manifest > /dev/null
+        eend $?
+
+        ;;
+    keyword)
+        if [[ ! -e ${PN}-${version}.ebuild ]]; then
+            ewarn "${PN} doesn't have ${version} version, skipping"
+            eoutdent
+            cd - > /dev/null
+            continue
+        fi
+
+        ebegin "Running ekeyword in ${atom}"
+        ekeyword ${keyword} ${PN}-${version}.ebuild > /dev/null
+        eend $?
+
+        ebegin "Running repoman manifest on ${atom}"
+        repoman manifest > /dev/null
+        eend $?
+
+        ;;
     esac
 
 
