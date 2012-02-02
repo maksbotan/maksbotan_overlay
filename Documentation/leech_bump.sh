@@ -96,6 +96,9 @@ case $mode in
         if [[ ${run_changelog} != "0" ]]; then
             run_changelog="1"
         fi
+        if [[ -z "${message}" ]]; then
+            message_stub=1
+        fi
         ;;
     commit)
         if [[ -z "${message}" ]]; then
@@ -151,8 +154,9 @@ for atom in */*; do
 
     case ${mode} in
     bump)
-        if [[ -z "${message}" ]]; then
+        if [[ "${message_stub}" == "1" ]]; then
             message="Bump ${atom} to ${version}, thanks to 0xd34df00d"
+
         fi
 
         einfo "Bumping ${atom} to ${version}"
@@ -192,6 +196,7 @@ for atom in */*; do
             echangelog ${message} > /dev/null
             eend $?
         fi
+
         ;;
     commit)
         einfo "Commiting ${atom} with message \"${message}\""
