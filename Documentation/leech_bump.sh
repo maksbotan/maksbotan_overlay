@@ -216,8 +216,15 @@ for atom in */*; do
 
         ;;
     delete)
-        if [[ -z "${message}" ]]; then
+        if [[ "${message_stub}" == "1" ]]; then
             message="Removed old ${PN}-${version}"
+        fi
+
+        if ! [[ -e "${PN}-${version}.ebuild" ]]; then
+            ewarn "${atom} lacks ${version} version, skipping delete"
+            eoutdent
+            cd - > /dev/null
+            continue
         fi
 
         ebegin "Deleting ${PN}-${version}"
