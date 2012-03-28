@@ -55,11 +55,9 @@ while (($#)); do
             ;;
         -c|--changelog)
             run_changelog="1"
-            shift
             ;;
         -N|--no-changelog)
             run_changelog="0"
-            shift
             ;;
        -v|--version)
             version="${2}"
@@ -98,6 +96,13 @@ case $mode in
         fi
         if [[ -z "${message}" ]]; then
             message_stub=1
+        fi
+        if [[ -z ${keywords} ]]; then
+            if [[ ${bump_from}} == 9999 ]]; then
+                keyword="~amd64 ~x86"
+            else
+                keyword="~all"
+            fi
         fi
         ;;
     commit)
@@ -179,8 +184,9 @@ for atom in */*; do
         cp ${PN}-{${bump_from},${version}}.ebuild
         eend $?
     
+
         ebegin "Setting keywords on ${PN}-${version}.ebuild"
-        ekeyword ~all ${PN}-${version}.ebuild > /dev/null
+        ekeyword ${keyword} ${PN}-${version}.ebuild > /dev/null
         eend $?
     
         ebegin "Running repoman manifest on ${atom}"
