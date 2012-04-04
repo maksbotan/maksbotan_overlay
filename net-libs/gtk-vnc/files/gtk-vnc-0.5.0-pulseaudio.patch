@@ -1,0 +1,24 @@
+--- gtk-vnc.0.5.0-orig/configure.ac	2012-04-04 22:19:44.149970383 +0400
++++ gtk-vnc-0.5.0/configure.ac	2012-04-04 22:23:37.927968882 +0400
+@@ -215,10 +215,18 @@
+ AC_SUBST(VIEW_CFLAGS)
+ AC_SUBST(VIEW_LIBS)
+ 
++AC_ARG_WITH(pulseaudio,
++[  --with-pulseaudio       enable audio support via pulseaudio],
++[case "${withval}" in
++   yes|no) ;;
++   *)	   AC_MSG_ERROR([bad value ${withval} for pulseaudio option]) ;;
++ esac],[withval=yes])
+ 
+-PKG_CHECK_MODULES(PULSEAUDIO, libpulse-simple, WANT_PULSEAUDIO="yes", AC_MSG_NOTICE([Not building against libpulse]))
+-if test "x$WANT_PULSEAUDIO" = xyes; then
+-    AC_DEFINE_UNQUOTED([HAVE_PULSEAUDIO], 1,[Define if we have and want pulseaudio.])
++if test "${withval}" = "yes"; then
++    PKG_CHECK_MODULES(PULSEAUDIO, libpulse-simple, WANT_PULSEAUDIO="yes", AC_MSG_NOTICE([Not building against libpulse]))
++    if test "x$WANT_PULSEAUDIO" = xyes; then
++        AC_DEFINE_UNQUOTED([HAVE_PULSEAUDIO], 1,[Define if we have and want pulseaudio.])
++    fi
+ fi
+ AM_CONDITIONAL([HAVE_PULSEAUDIO], [test "x$WANT_PULSEAUDIO" = "xyes"])
+ AC_SUBST(PULSEAUDIO_CFLAGS)
