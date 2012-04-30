@@ -29,11 +29,20 @@ IUSE=""
 DEPEND=""
 RDEPEND="${DEPEND}"
 
-ruby_add_bdepend dev-ruby/rake
-ruby_add_rdepend dev-ruby/fakeweb
-ruby_add_rdepend dev-ruby/json
-ruby_add_rdepend dev-ruby/rr
+ruby_add_bdepend "
+	dev-ruby/rake
+	test? (
+		dev-ruby/fakeweb
+		dev-ruby/rr
+	)"
+ruby_add_rdepend "
+	dev-ruby/json"
 
 all_ruby_unpack() {
 	${git_eclass}_src_unpack
+}
+
+pkg_postinst() {
+	einfo "If 'gisty post' gives you SSL errors,"
+	einfo "try to set GISTY_SSL_VERIFY=none"
 }
