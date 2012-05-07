@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-MY_REV="b44dee0e6db8"
+MY_REV="e013486008e6"
 PYTHON_DEPEND="2"
 SUPPORT_PYTHON_ABIS="1"
 RESTRICT_PYTHON_ABIS="3.*"
@@ -13,7 +13,7 @@ inherit python
 
 DESCRIPTION="Command-line interface to paste.pocoo.org"
 HOMEPAGE="http://paste.pocoo.org/"
-SRC_URI="https://bitbucket.org/EnTeQuAk/lodgeit-main/raw/${MY_REV}/scripts/lodgeit.py
+SRC_URI="https://bitbucket.org/skrattaren/lodgeit-script-gentoo/raw/${MY_REV}/scripts/lodgeit.py
 	-> ${P}.py
 	vim? ( http://www.vim.org/scripts/download_script.php?src_id=8848
 	-> ${P}.vim )"
