@@ -16,7 +16,7 @@ changelog_helper() {
     fi
 }
 
-if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
+if [[ ${#} -lt 2 && ${1} != "repoman" && ${1} != "list" ]]; then
     eerror "Not enough arguments"
     einfo "Usage: ${0} mode arguments"
     einfo "Supported modes are:"
@@ -26,6 +26,7 @@ if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
     einfo " - delete"
     einfo " - changelog"
     einfo " - keyword"
+    einfo " - list"
     einfo "Supported arguments are:"
     einfo " -m --message        Commit message"
     einfo " -c --changelog      Update ChangeLog"
@@ -37,7 +38,7 @@ if [[ ${#} -lt 2 && ${1} != "repoman" ]]; then
 fi
 
 case "${1}" in
-    bump|commit|repoman|delete|changelog|keyword) ;;
+    bump|commit|repoman|delete|changelog|keyword|list) ;;
     *)
         eerror "Unknown mode ${1}"
         exit 1
@@ -59,7 +60,7 @@ while (($#)); do
         -N|--no-changelog)
             run_changelog="0"
             ;;
-       -v|--version)
+        -v|--version)
             version="${2}"
             shift
             ;;
@@ -95,9 +96,9 @@ case $mode in
             run_changelog="1"
         fi
         if [[ -z "${message}" ]]; then
-            message_stub=1
+            message_stub="1"
         fi
-        if [[ -z ${keywords} ]]; then
+        if [[ -z ${keyword} ]]; then
             if [[ ${bump_from}} == 9999 ]]; then
                 keyword="~amd64 ~x86"
             else
@@ -141,8 +142,10 @@ if [[ ! -e ./profiles/repo_name ]]; then
     exit 1
 fi
 
-einfo "Scanning tree for LeechCraft packages"
-echo
+if [[ ${mode} != "list" ]]; then
+    einfo "Scanning tree for LeechCraft packages"
+    echo
+fi
 
 for atom in */*; do
     CATEGORY=${atom%/*}
@@ -153,8 +156,10 @@ for atom in */*; do
     if [[ ${PN} != leechcraft-* ]]; then
         continue
     fi
-    einfo "Going to ${atom}"
-    eindent
+    if [[ ${mode} != "list" ]]; then
+        einfo "Going to ${atom}"
+        eindent
+    fi
     cd ${atom}
 
     case ${mode} in
@@ -234,8 +239,7 @@ for atom in */*; do
         fi
 
         ebegin "Deleting ${PN}-${version}"
-        rm ${PN}-${version}.ebuild
-        cvs rm ${PN}-${version}.ebuild > /dev/null
+        cvs rm -f ${PN}-${version}.ebuild > /dev/null
         eend $?
 
         if [[ ${run_changelog} == "1" ]]; then
@@ -276,9 +280,16 @@ for atom in */*; do
         eend $?
 
         ;;
+    list)
+        if [[ ${version} ]]; then
+            [[ -e ${PN}-${version}.ebuild ]] && echo =${CATEGORY}/${PN}-${version}
+        else
+            echo ${CATEGORY}/${PN}
+        fi
+        ;;
     esac
 
 
     cd - > /dev/null
-    eoutdent
+    [[ ${mode} != "list" ]] && eoutdent
 done
