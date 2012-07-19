@@ -2,6 +2,8 @@
 
 . /etc/init.d/functions.sh
 
+trap 'exit 1' INT QUIT TERM
+
 #First argument is changelog arg, second is message arg, third is default message
 changelog_helper() {
     if [[ "x${1}" == "x--changelog" ]]; then
