@@ -20,7 +20,9 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="doc examples"
 
-DEPEND="dev-python/setuptools"
+DEPEND="
+	dev-python/setuptools
+	doc? ( dev-python/sphinx )"
 RDEPEND="
 	dev-python/dnspython
 	dev-python/python-gnupg
@@ -29,7 +31,8 @@ RDEPEND="
 src_install() {
 	distutils_src_install
 	if use doc; then
-		dodoc -r docs
+		make -C docs html
+		dohtml -r docs/_build/html/
 	fi
 	if use examples; then
 		dodoc -r examples
