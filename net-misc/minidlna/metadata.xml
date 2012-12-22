@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<maintainer>
+	<email>maksbotan@gentoo.org</email>
+	<name>Maxim Koltsov</name>
+</maintainer>
+<use>
+<flag name="tivo">Enable TiVo support</flag>
+<flag name="netgear">Enable generic NETGEAR device support</flag>
+<flag name="readynas">Enable NETGEAR ReadyNAS support</flag>
+</use>
+</pkgmetadata>
