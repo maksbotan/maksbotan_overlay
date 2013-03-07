@@ -20,9 +20,9 @@ RESTRICT="strip"
 DEPEND="app-admin/chrpath"
 RDEPEND="
 	media-libs/openal
-	x11-libs/qt-core:4
-	x11-libs/qt-gui:4
-	x11-libs/qt-webkit:4
+	dev-qt/qtcore:4
+	dev-qt/qtgui:4
+	dev-qt/qtwebkit:4
 	x11-libs/libX11
 	x11-libs/libXext
 	x11-libs/libXinerama
