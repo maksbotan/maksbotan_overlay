@@ -1,0 +1,12 @@
+--- setup.py	2013-02-02 02:04:58.000000000 +0400
++++ setup.py	2013-03-13 20:24:19.530152293 +0400
+@@ -136,7 +136,8 @@
+ else:
+     macros.append(('_GNU_SOURCE', None))
+ 
+-extra_link_args = ldflags.split()
++extra_link_args = ldflags.split() + ['-Wl,-rpath=' + libdir]
++
+ kwds = dict(
+     ext_modules = [
+         Extension(

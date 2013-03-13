@@ -20,16 +20,10 @@ IUSE=""
 DEPEND="sys-devel/llvm[multitarget]"
 RDEPEND="${DEPEND}"
 
-python_prepare() {
-	distutils-r1_python_prepare
-	if [[ ${EPYTHON} == python3.* ]]; then
-		einfo "Running 2to3..."
-		2to3 -w --no-diffs "${BUILD_DIR}"/llvm > "${T}"/${EPYTHON}-2to3.log 2>&1 || die "2to3 failed, log file: ${T}/${EPYTHON}-2to3.log"
-	fi
-}
+PATCHES=( "${FILESDIR}"/${P}-rpath.patch )
 
 python_test() {
-	pushd "${BUILD_DIR}"/build/lib* > /dev/null
+	pushd ${BUILD_DIR}/lib/ > /dev/null
 	${PYTHON} -c "import llvm; llvm.test()"
 	popd > /dev/null
 }
