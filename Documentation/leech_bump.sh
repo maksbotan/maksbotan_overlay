@@ -155,7 +155,7 @@ for atom in */*; do
     if [[ $CATEGORY == "eclass" ]]; then
         continue
     fi
-    if [[ ${PN} != leechcraft-* ]]; then
+    if ! [[ ( ${CATEGORY} == app-leechcraft && ${PN} == lc-* ) || (${PN} == leechcraft-*) ]]; then
         continue
     fi
     if [[ ${mode} != "list" ]]; then
