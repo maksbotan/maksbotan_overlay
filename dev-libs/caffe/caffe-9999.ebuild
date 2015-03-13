@@ -125,9 +125,11 @@ src_install() {
 	dolib.a distribute/lib/libcaffe.a
 	dolib.so distribute/lib/libcaffe.so
 
-	rm distribute/python/caffe/_caffe.cpp || die "rm failed"
-	python_domodule distribute/python/caffe
-	for script in distribute/python/*.py; do
-		python_doscript ${script}
-	done
+	if use python; then
+		rm distribute/python/caffe/_caffe.cpp || die "rm failed"
+		python_domodule distribute/python/caffe
+		for script in distribute/python/*.py; do
+			python_doscript ${script}
+		done
+	fi
 }
