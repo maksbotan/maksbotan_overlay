@@ -4,7 +4,8 @@
 
 EAPI=5
 
-EGIT_REPO_URI="git://github.com/BVLC/caffe.git"
+#EGIT_REPO_URI="git://github.com/BVLC/caffe.git"
+EGIT_REPO_URI="git://github.com/NVIDIA/caffe"
 PYTHON_COMPAT=( python2_7 )
 
 inherit toolchain-funcs multilib git-r3 python-single-r1
@@ -60,6 +61,10 @@ src_configure() {
 BLAS := atlas
 BUILD_DIR := build
 DISTRIBUTE_DIR := distribute
+
+USE_PKG_CONFIG := 1
+
+LIBRARY_NAME_SUFFIX := -nv
 EOF
 
 	if use cuda; then
@@ -93,9 +98,14 @@ EOF
 
 		local py_version=${EPYTHON#python}
 		sed -e "/PYTHON_LIBRARIES/s/python\s/python-${py_version} /g" \
-			-e '/blas/s/atlas//' \
 			-i Makefile || die "sed failed"
 	fi
+
+	sed -e '/blas/s/atlas//' \
+		-e '/^LINKFLAGS +=/ a\
+		LINKFLAGS += -L$(LIB_BUILD_DIR)
+		' \
+		-i Makefile || die "sed failed"
 
 	tc-export CC CXX
 }
@@ -116,14 +126,15 @@ src_install() {
 	emake distribute
 
 	for bin in distribute/bin/*; do
-		dobin ${bin}
+		local name=$(basename ${bin})
+		newbin ${bin} ${name//.bin/}
 	done
 
 	insinto /usr
 	doins -r distribute/include/
 
-	dolib.a distribute/lib/libcaffe.a
-	dolib.so distribute/lib/libcaffe.so
+	dolib.a distribute/lib/libcaffe*.a*
+	dolib.so distribute/lib/libcaffe*.so*
 
 	if use python; then
 		rm distribute/python/caffe/_caffe.cpp || die "rm failed"
