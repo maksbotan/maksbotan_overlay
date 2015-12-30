@@ -4,25 +4,22 @@
 
 EAPI=5
 
-DESCRIPTION="KeePass plugin to expose password entries securely (256bit AES/CBC) over HTTP"
-HOMEPAGE="https://github.com/pfn/keepasshttp"
-SRC_URI="https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx"
+MY_PN="PronouncePwGen"
+DESCRIPTION="A pronounceable password generator plugin for KeePass"
+HOMEPAGE="https://sourceforge.net/projects/pronouncepwgen/"
+SRC_URI="mirror://sourceforge/${PN}/${PN}/${PV}/${MY_PN}-${PV}.zip"
 
-LICENSE="GPL-3"
+LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS=""
+KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND=">=app-admin/keepass-2.20"
+DEPEND=">=app-admin/keepass-2.19"
 RDEPEND="${DEPEND}"
 
 INSTALL_DIR="/usr/lib/keepass/"
-PLUGIN_FILENAME="KeePassHttp.plgx"
+PLUGIN_FILENAME="PronouncePwGen.plgx"
 S="${WORKDIR}"
-
-src_unpack() {
-	cp "${DISTDIR}/${PLUGIN_FILENAME}" "${WORKDIR}" || die
-}
 
 src_install() {
 	chmod 644 "${PLUGIN_FILENAME}"
