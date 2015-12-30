@@ -8,7 +8,7 @@ DESCRIPTION="KeePass plugin to expose password entries securely (256bit AES/CBC)
 HOMEPAGE="https://github.com/pfn/keepasshttp"
 SRC_URI="https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx"
 
-LICENSE=""  # nothing in the repository
+LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS=""
 IUSE=""
