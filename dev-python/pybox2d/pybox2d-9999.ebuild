@@ -21,6 +21,6 @@ IUSE=""
 
 DEPEND="
 	dev-lang/swig:0
-	dev-python/pygame
+	dev-python/pygame[${PYTHON_USEDEP}]
 "
 RDEPEND=""
