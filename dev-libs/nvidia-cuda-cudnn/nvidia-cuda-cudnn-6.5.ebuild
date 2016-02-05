@@ -17,9 +17,9 @@ RESTRICT="fetch"
 S="${WORKDIR}/${PKG}"
 
 pkg_nofetch() {
-    einfo "Please download"
-    einfo "  - cudnn-6.5-linux-x64-v2.tgz"
-    einfo "from ${HOMEPAGE} and place them in ${DISTDIR}"
+	einfo "Please download"
+	einfo "  - cudnn-6.5-linux-x64-v2.tgz"
+	einfo "from ${HOMEPAGE} and place them in ${DISTDIR}"
 }
 
 src_install() {
